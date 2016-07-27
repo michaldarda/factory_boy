@@ -1,6 +1,8 @@
 require 'factory_boy/version'
 require 'factory_boy/factory'
 
+require 'active_support/core_ext/string/inflections'
+
 module FactoryBoy
   class FactoryNotFound < StandardError; end
   def self.factories
@@ -10,7 +12,7 @@ module FactoryBoy
   # name can be :user or User, there could also be passed
   # class option
   def self.define_factory(name, options = {}, &block)
-    klass = options.fetch(:class) { const_get(name.to_s.capitalize) }
+    klass = options.fetch(:class) { const_get(name.to_s.classify) }
 
     factory_instance = Factory.new(klass)
 
@@ -25,7 +27,7 @@ module FactoryBoy
   end
 
   def self.build(name, attributes = {})
-    name = name.to_s.downcase.to_sym
+    name = name.to_s.underscore.to_sym
 
     (factory = factories[name]) || raise(FactoryNotFound)
 

@@ -9,8 +9,8 @@ module FactoryBoy
     end
 
     # treating all the methods as attributes
-    def method_missing(attribute, *args)
-      @attributes[attribute] = args.first
+    def method_missing(attribute, *args, &block)
+      @attributes[attribute] = block_given? ? block : args.first
     end
   end
 end

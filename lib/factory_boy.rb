@@ -34,7 +34,7 @@ module FactoryBoy
 
     instance.tap do
       instance_attributes.each do |attribute, value|
-        instance.send("#{attribute}=", value)
+        instance.send("#{attribute}=", value.is_a?(Proc) ? value.call : value)
       end
     end
   end

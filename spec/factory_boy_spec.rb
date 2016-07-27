@@ -68,4 +68,14 @@ describe FactoryBoy do
 
     expect(instance).to be_kind_of(User)
   end
+
+  it 'allows to set lazy evaluated properties' do
+    FactoryBoy.define_factory(User) do
+      name { 'Michał' }
+    end
+
+    instance = FactoryBoy.build(User)
+
+    expect(instance.name).to eq 'Michał'
+  end
 end

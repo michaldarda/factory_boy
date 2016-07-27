@@ -1,21 +1,19 @@
 require 'spec_helper'
 
 describe FactoryBoy do
+  User = Struct.new(:name)
+
   before do
     FactoryBoy.instance_variable_set('@factories', {})
   end
 
   it 'allows to define factory' do
-    User = Struct.new(:name)
-
     user_factory = FactoryBoy.define_factory(User)
 
     expect(user_factory).to be_kind_of(FactoryBoy::Factory)
   end
 
   it 'allows to build instance of given class' do
-    User = Struct.new(:name)
-
     FactoryBoy.define_factory(User)
     instance = FactoryBoy.build(User)
 
@@ -23,8 +21,6 @@ describe FactoryBoy do
   end
 
   it 'allows to pass custom parameters' do
-    User = Struct.new(:name)
-
     FactoryBoy.define_factory(User)
     instance = FactoryBoy.build(User, name: 'Michał')
 
@@ -37,8 +33,6 @@ describe FactoryBoy do
   end
 
   it 'allows to define value for attributes' do
-    User = Struct.new(:name)
-
     FactoryBoy.define_factory(User) do
       name 'Michał'
     end
@@ -49,8 +43,6 @@ describe FactoryBoy do
   end
 
   it 'allows to define value for attributes' do
-    User = Struct.new(:name)
-
     FactoryBoy.define_factory(User) do
       name 'Michał'
     end

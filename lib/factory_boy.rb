@@ -1,21 +1,8 @@
 require 'factory_boy/version'
+require 'factory_boy/factory'
 
 module FactoryBoy
   class FactoryNotFound < StandardError; end
-  class Factory
-    attr_reader :attributes
-
-    def initialize(name)
-      @name = name
-
-      @attributes = {}
-    end
-
-    def method_missing(meth, *args)
-      @attributes[meth] = args.first
-    end
-  end
-
   def self.factories
     @factories ||= {}
   end

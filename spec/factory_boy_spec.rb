@@ -58,4 +58,20 @@ describe FactoryBoy do
     
     expect(instance.name).to eq "Przemysław"
   end 
+  
+  it 'allows to pass symbol instead of class name to define_factory' do
+    FactoryBoy.define_factory(:user)
+    
+    instance = FactoryBoy.build(:user)
+    
+    expect(instance).to be_kind_of(User)
+  end 
+  
+  it 'allows to pass alias class name to define_factory' do
+    FactoryBoy.define_factory(:admin, class: User)
+    
+    instance = FactoryBoy.build(:admin)
+    
+    expect(instance).to be_kind_of(User)
+  end 
 end

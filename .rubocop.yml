@@ -1,0 +1,6 @@
+Documentation:
+  Enabled: false
+AllCops:
+  Include:
+    - 'lib/*.rb'
+    - 'spec/*.rb'

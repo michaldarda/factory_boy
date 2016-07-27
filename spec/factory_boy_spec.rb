@@ -34,4 +34,28 @@ describe FactoryBoy do
   it 'raises exception if factory is not found' do
     expect{FactoryBoy.build(User, name: "Michał")}.to raise_error(FactoryBoy::FactoryNotFound)
   end 
+  
+  it 'allows to define value for attributes' do
+    User = Struct.new(:name)
+    
+    FactoryBoy.define_factory(User) do
+      name "Michał"
+    end
+    
+    instance = FactoryBoy.build(User)
+    
+    expect(instance.name).to eq "Michał"
+  end 
+  
+  it 'allows to define value for attributes' do
+    User = Struct.new(:name)
+    
+    FactoryBoy.define_factory(User) do
+      name "Michał"
+    end
+    
+    instance = FactoryBoy.build(User, name: "Przemysław")
+    
+    expect(instance.name).to eq "Przemysław"
+  end 
 end

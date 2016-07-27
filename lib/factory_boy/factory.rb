@@ -8,8 +8,9 @@ module FactoryBoy
       @attributes = {}
     end
 
-    def method_missing(meth, *args)
-      @attributes[meth] = args.first
+    # treating all the methods as attributes
+    def method_missing(attribute, *args)
+      @attributes[attribute] = args.first
     end
   end
 end

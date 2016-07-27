@@ -5,10 +5,6 @@ require 'active_support/core_ext/string/inflections'
 
 module FactoryBoy
   class FactoryNotFound < StandardError; end
-  def self.factories
-    @factories ||= {}
-  end
-
   # name can be :user or User, there could also be passed
   # class option
   def self.define_factory(name, options = {}, &block)
@@ -16,10 +12,7 @@ module FactoryBoy
 
     factory_instance = Factory.new(klass)
 
-    factories[name.to_s.downcase.to_sym] = {
-      class: klass,
-      instance: factory_instance
-    }
+    __register_factory__(name, factory_instance, klass)
 
     factory_instance.instance_eval(&block) if block_given?
 
@@ -29,15 +22,31 @@ module FactoryBoy
   def self.build(name, attributes = {})
     name = name.to_s.underscore.to_sym
 
-    (factory = factories[name]) || raise(FactoryNotFound)
+    (factory = __factories__[name]) || raise(FactoryNotFound)
 
-    instance_attributes = factory.fetch(:instance).attributes.merge(attributes)
-    instance = factory.fetch(:class).new
+    __build_object__(factory, attributes)
+  end
 
-    instance_attributes.each do |attribute, value|
-      instance.send("#{attribute}=", value)
+  def self.__build_object__(factory_data, attributes = {})
+    instance = factory_data.fetch(:class).new
+    instance_attributes =
+      factory_data.fetch(:instance).attributes.merge(attributes)
+
+    instance.tap do
+      instance_attributes.each do |attribute, value|
+        instance.send("#{attribute}=", value)
+      end
     end
+  end
 
-    instance
+  def self.__register_factory__(name, instance, klass)
+    __factories__[name.to_s.downcase.to_sym] = {
+      class: klass,
+      instance: instance
+    }
+  end
+
+  def self.__factories__
+    @factories ||= {}
   end
 end

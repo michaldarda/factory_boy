@@ -4,6 +4,7 @@ describe FactoryBoy do
   User = Struct.new(:name)
 
   before do
+    # reset global factories list
     FactoryBoy.instance_variable_set('@factories', {})
   end
 

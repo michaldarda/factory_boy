@@ -1,52 +1,62 @@
 require 'factory_boy/version'
-require 'factory_boy/factory'
-
-require 'active_support/core_ext/string/inflections'
+require 'factory_boy/definition_proxy'
 
 module FactoryBoy
   class FactoryNotFound < StandardError; end
-  # name can be :user or User, there could also be passed
-  # class option
-  def self.define_factory(name, options = {}, &block)
-    klass = options.fetch(:class) { const_get(name.to_s.classify) }
+  class << self
+    # name can be :user or User, there could also be passed
+    # class option
+    def define_factory(name, options = {}, &block)
+      klass = options.fetch(:class) { const_get(symbol_to_class_name(name)) }
 
-    factory_instance = Factory.new(klass)
+      factory_instance = DefinitionProxy.new
 
-    __register_factory__(name, factory_instance, klass)
+      register_factory(name, factory_instance, klass)
 
-    factory_instance.instance_eval(&block) if block_given?
+      factory_instance.instance_eval(&block) if block_given?
+    end
 
-    factory_instance
-  end
+    def build(name, attributes = {})
+      (factory = factories[normalize_name(name)]) || raise(FactoryNotFound)
 
-  def self.build(name, attributes = {})
-    name = name.to_s.underscore.to_sym
+      build_object(factory, attributes)
+    end
 
-    (factory = __factories__[name]) || raise(FactoryNotFound)
+    private
 
-    __build_object__(factory, attributes)
-  end
+    def build_object(factory_data, attributes = {})
+      instance = factory_data.fetch(:class).new
+      instance_attributes =
+        factory_data.fetch(:instance).attributes.merge(attributes)
 
-  def self.__build_object__(factory_data, attributes = {})
-    instance = factory_data.fetch(:class).new
-    instance_attributes =
-      factory_data.fetch(:instance).attributes.merge(attributes)
-
-    instance.tap do
-      instance_attributes.each do |attribute, value|
-        instance.send("#{attribute}=", value.is_a?(Proc) ? value.call : value)
+      instance.tap do
+        instance_attributes.each do |attribute, value|
+          instance.send("#{attribute}=", attribute_value(value))
+        end
       end
     end
-  end
 
-  def self.__register_factory__(name, instance, klass)
-    __factories__[name.to_s.downcase.to_sym] = {
-      class: klass,
-      instance: instance
-    }
-  end
+    def register_factory(name, instance, klass)
+      factories[normalize_name(name)] = {
+        class: klass,
+        instance: instance
+      }
+    end
 
-  def self.__factories__
-    @factories ||= {}
+    def symbol_to_class_name(sym)
+      sym.to_s.capitalize
+    end
+
+    def normalize_name(name)
+      name.to_s.downcase.to_sym
+    end
+
+    def attribute_value(value)
+      value.respond_to?(:call) ? value.call : value
+    end
+
+    def factories
+      @factories ||= {}
+    end
   end
 end

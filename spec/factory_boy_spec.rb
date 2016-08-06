@@ -9,9 +9,7 @@ describe FactoryBoy do
   end
 
   it 'allows to define factory' do
-    user_factory = FactoryBoy.define_factory(User)
-
-    expect(user_factory).to be_kind_of(FactoryBoy::Factory)
+    FactoryBoy.define_factory(User)
   end
 
   it 'allows to build instance of given class' do
